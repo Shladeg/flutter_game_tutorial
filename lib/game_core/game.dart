@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_game_tutorial/entities/player.dart';
 import 'package:flutter_game_tutorial/game_core/main_loop.dart';
 import 'package:flutter_game_tutorial/utils/common_var.dart';
 
@@ -12,11 +13,10 @@ class Game extends StatefulWidget {
 }
 
 class _GameState extends State<Game> {
-  double x = 100;
-  double y = 200;
-
   ReceivePort? _receivePort;
   Isolate? _isolateLoop;
+
+  late Player player;
 
   void startIsolateLopp() async {
     _receivePort = ReceivePort();
@@ -24,12 +24,6 @@ class _GameState extends State<Game> {
 
     _receivePort?.listen((message) {
       setState(() {});
-
-      x++;
-
-      if (x == 500) {
-        x = 0;
-      }
     });
   }
 
@@ -38,16 +32,14 @@ class _GameState extends State<Game> {
     if (isFirstStartGame) {
       startIsolateLopp();
       isFirstStartGame = false;
+
+      player = Player();
     }
 
+    player.update();
+
     return Stack(
-      children: [
-        Positioned(
-          child: Text("qweqwe"),
-          top: y,
-          left: x,
-        )
-      ],
+      children: [player.build()],
     );
   }
 }
