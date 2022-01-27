@@ -20,6 +20,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: Game());
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SafeArea(
+            child: Scaffold(
+          body: Container(
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/background.png"),
+                    fit: BoxFit.cover)),
+            child: Game(),
+          ),
+        )));
   }
 }

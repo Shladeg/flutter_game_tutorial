@@ -1,9 +1,8 @@
 import 'dart:isolate';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_game_tutorial/entities/player.dart';
 import 'package:flutter_game_tutorial/game_core/main_loop.dart';
-import 'package:flutter_game_tutorial/utils/common_var.dart';
+import 'package:flutter_game_tutorial/utils/global_var.dart';
 
 class Game extends StatefulWidget {
   Game({Key? key}) : super(key: key);
@@ -16,30 +15,31 @@ class _GameState extends State<Game> {
   ReceivePort? _receivePort;
   Isolate? _isolateLoop;
 
-  late Player player;
-
-  void startIsolateLopp() async {
+  void _startIsolateLopp() async {
     _receivePort = ReceivePort();
     _isolateLoop = await Isolate.spawn(mainLoop, _receivePort?.sendPort);
 
     _receivePort?.listen((message) {
+      GlobalVars.currentScene.update();
       setState(() {});
     });
   }
 
   @override
+  void initState() {
+    _startIsolateLopp();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _receivePort?.close();
+    _isolateLoop?.kill();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isFirstStartGame) {
-      startIsolateLopp();
-      isFirstStartGame = false;
-
-      player = Player();
-    }
-
-    player.update();
-
-    return Stack(
-      children: [player.build()],
-    );
+    return GlobalVars.currentScene.buildScene();
   }
 }
